@@ -205,6 +205,14 @@ class DatabaseAuthenticatableTest < ActiveSupport::TestCase
     assert user.password_confirmation.blank?
   end
 
+  test 'should not update user password when wrong current password is given' do
+    user = create_user
+    old_enc_passwd = user.encrypted_password
+    refute user.update_with_password(current_password: "wrong", password: "new")
+    user.save!
+    refute user.valid_password?("new")
+  end
+
   test 'should update the user without password' do
     user = create_user
     user.update_without_password(email: 'new@example.com')
